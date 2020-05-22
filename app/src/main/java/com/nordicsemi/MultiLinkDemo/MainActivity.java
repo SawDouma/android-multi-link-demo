@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -38,6 +39,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -49,7 +51,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements RadioGroup.OnCheckedChangeListener {
+import com.blankj.utilcode.util.PermissionUtils;
+import com.blankj.utilcode.util.Utils;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import io.reactivex.disposables.Disposable;
+
+public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener {
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int UART_PROFILE_READY = 10;
@@ -78,7 +86,9 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        Utils.init(getApplication());
 
+        requestPermission();
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBtAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
@@ -217,6 +227,19 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 mStatusText.setText("Connected Devices: " + String.valueOf(mBleLinkManager.getNumberOfLinks()));
             }
         });
+    }
+
+    private void requestPermission() {
+        RxPermissions rxPermissions = new RxPermissions(this);
+        Disposable disposable = rxPermissions.request(Manifest.permission.ACCESS_COARSE_LOCATION)
+                .subscribe(allow -> {
+                    if(allow){
+
+                    }else{
+
+                    }
+                });
+
     }
 
     private void updateHueIntensity(){
